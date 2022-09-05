@@ -3,12 +3,16 @@ from typing import List, Tuple
 
 
 class Day:
-    def __init__(self, persian: Tuple[int, int, int], gregorian: Tuple[int, int, int], islamic: Tuple[int, int, int], is_holiday: bool, week_day: int,
+    def __init__(self, persian: Tuple[int, int, int], gregorian: Tuple[int, int, int], islamic: Tuple[int, int, int], week_day: int,
                  week_num: int):
         self.persian = persian
         self.gregorian = gregorian
         self.islamic = islamic
-        self.is_holiday = is_holiday
+
+        is_holiday_persian = PERSIAN_HOLIDAYS.get(persian[1]) is not None and PERSIAN_HOLIDAYS.get(persian[1]).get(persian[2]) is not None
+        is_holiday_islamic = ISLAMIC_HOLIDAY.get(islamic[1]) is not None and ISLAMIC_HOLIDAY.get(islamic[1]).get(islamic[2]) is not None
+        self.is_holiday = week_day == 6 or is_holiday_persian or is_holiday_islamic
+
         self.week_day = week_day
         self.week_num = week_num
 
@@ -27,6 +31,63 @@ PERSIAN_MONTHS = ["فروردین", "اردیبهشت", "خرداد", "تیر", 
 GREGORIAN_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 ISLAMIC_MONTHS = ["محرم", "صفر", "ربیع الاول", "ربیع الثاني", "جمادي الاول", "جمادي الثاني", "رجب", "شعبان", "رمضان", "شوال", "ذوالقعده", "ذوالحجه"]
 WEEKDAYS = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه", "پنجشنبه", "جمعه"]
+PERSIAN_HOLIDAYS = {
+    1: {
+        1: "جشن نوروز/جشن سال نو",
+        2: "عیدنوروز",
+        3: "عیدنوروز",
+        4: "عیدنوروز",
+        12: "روز جمهوری اسلامی",
+        13: "جشن سیزده به در"
+    },
+    3: {
+        14: "رحلت حضرت امام خمینی",
+        15: "قیام ۱۵ خرداد"
+    },
+    11: {
+        22: "پیروزی انقلاب اسلامی"
+    },
+    12: {
+        29: "روز ملی شدن صنعت نفت ایران"
+    }
+}
+ISLAMIC_HOLIDAY = {
+    1: {
+        9: "تاسوعای حسینی",
+        10: "عاشورای حسینی"
+    },
+    2: {
+        20: "اربعین حسینی",
+        28: "رحلت رسول اکرم؛شهادت امام حسن مجتبی علیه السلام",
+        30: "شهادت امام رضا علیه السلام",
+    },
+    3: {
+        8: "شهادت امام حسن عسکری علیه السلام",
+        17: "میلاد رسول اکرم و امام جعفر صادق علیه السلام"
+    },
+    6: {
+        3: "شهادت حضرت فاطمه زهرا سلام الله علیها"
+    },
+    7: {
+        13: "ولادت امام علی علیه السلام و روز پدر",
+        27: "مبعث رسول اکرم (ص)"
+    },
+    8: {
+        15: "ولادت حضرت قائم عجل الله تعالی فرجه و جشن نیمه شعبان"
+    },
+    9: {
+        21: "شهادت حضرت علی علیه السلام"
+    },
+    10: {
+        1: "عید سعید فطر",
+        2: "تعطیل به مناسبت عید سعید فطر",
+        25: "شهادت امام جعفر صادق علیه السلام",
+    },
+    12: {
+        10: "عید سعید قربان",
+        18: "عید سعید غدیر خم",
+    }
+}
 
 
 def persian_to_jd(persian: Tuple[int, int, int]) -> float:
@@ -150,7 +211,6 @@ def get_day_from_persian(persian: Tuple[int, int, int], week_num: int):
         persian,
         persian_to_gregorian(persian),
         persian_to_islamic(persian),
-        False,
         weekday(persian_to_jd(persian)),
         week_num
     )
