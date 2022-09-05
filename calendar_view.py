@@ -1,7 +1,9 @@
 import re
 
+import openpyxl
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
+from openpyxl.worksheet import worksheet
 from openpyxl.worksheet.worksheet import Worksheet
 
 from calendar_model import generate_days, PERSIAN_MONTHS, GREGORIAN_MONTHS, ISLAMIC_MONTHS, WEEKDAYS
@@ -78,24 +80,24 @@ def style_weekdays(ws: Worksheet):
 def style_day_big(cell, ws: Worksheet, is_holiday: bool = False):
     ws.row_dimensions[1].height = 50
 
-    cell.font = Font(name="A Dast Nevis", size=48, bold=True, color=blush if is_holiday else gunmetal)
+    cell.font = Font(name="A Dast Nevis", size=35, bold=True, color=blush if is_holiday else gunmetal)
 
 
 def style_day_normal(cell, ws: Worksheet, is_holiday: bool = False):
     cell_str = str(cell.value)
     cell.font = Font(
         name="Calibri" if re.search("[0-9]+( \D+)?", cell_str) else "A Dast Nevis",
-        size=11 if " " in cell_str else 17,
+        size=9 if " " in cell_str else 17,
         bold=True,
         color=blush if is_holiday else gunmetal)
 
 
 # noinspection PyShadowingNames
 def style_days(ws: Worksheet):
-    for i in range(14):
-        ws.column_dimensions["abcdefghijklmno".upper()[i]].width = 11
+    for col in "abcdefghijklmn".upper():
+        ws.column_dimensions[col].width = 8.5
     for i in range(4, 16):
-        ws.row_dimensions[i].height = 35
+        ws.row_dimensions[i].height = 30
     for rows in ws.iter_rows(min_row=4, max_row=15, min_col=1, max_col=14):
         for cell in rows:
             cell.fill = PatternFill(patternType="solid", start_color=ivory, end_color=ivory)
@@ -144,6 +146,7 @@ for monthNum, month in enumerate(months):
     wb.active = wb[monthName]
     ws = wb.active
     ws.sheet_view.rightToLeft = True
+    Worksheet.set_printer_settings(ws, paper_size=9, orientation='landscape')
 
     # add days
     prev = None
