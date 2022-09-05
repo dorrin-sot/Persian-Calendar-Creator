@@ -1,9 +1,8 @@
+import pathlib
 import re
 
-import openpyxl
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font, PatternFill
-from openpyxl.worksheet import worksheet
 from openpyxl.worksheet.worksheet import Worksheet
 
 from calendar_model import generate_days, PERSIAN_MONTHS, GREGORIAN_MONTHS, ISLAMIC_MONTHS, WEEKDAYS
@@ -21,7 +20,7 @@ def arabic(num: int) -> str:
     return "".join(["٠١٢٣٤٥٦٧٨٩"[int(c)] for c in str(num)])
 
 
-days = generate_days(1401)
+days = generate_days(int(input("Jalali year: ")))
 months = []
 for day in days:
     if day.persian[2] == 1:
@@ -73,22 +72,21 @@ def style_weekdays(ws: Worksheet):
     for cols in ws.iter_cols(min_col=1, max_col=14, min_row=3, max_row=3):
         cell = cols[0]
         cell.fill = PatternFill(fill_type="solid", start_color=timberwolf, end_color=timberwolf)
-        cell.font = Font(name="Far.Domrol", size=20, bold=True, color=gunmetal)
+        cell.font = Font(name="Far.Domrol", size=18, bold=True, color=gunmetal)
     pass
 
 
 def style_day_big(cell, ws: Worksheet, is_holiday: bool = False):
     ws.row_dimensions[1].height = 50
 
-    cell.font = Font(name="A Dast Nevis", size=35, bold=True, color=blush if is_holiday else gunmetal)
+    cell.font = Font(name="Calibri", size=35, bold=True, color=blush if is_holiday else gunmetal)
 
 
 def style_day_normal(cell, ws: Worksheet, is_holiday: bool = False):
     cell_str = str(cell.value)
     cell.font = Font(
-        name="Calibri" if re.search("[0-9]+( \D+)?", cell_str) else "A Dast Nevis",
+        name="Calibri" if re.search("[0-9]+( \D+)?", cell_str) else "Calibri",
         size=9 if " " in cell_str else 17,
-        bold=True,
         color=blush if is_holiday else gunmetal)
 
 
@@ -193,3 +191,5 @@ for monthNum, month in enumerate(months):
 
 # Save the file
 wb.save("calendar.xlsx")
+
+print(f"Done! Your Excel file is saved in {pathlib.Path(__file__).parent.resolve()}/calendar.xslx")
